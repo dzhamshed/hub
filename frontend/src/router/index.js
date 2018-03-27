@@ -4,6 +4,8 @@ import VueSocketio from 'vue-socket.io';
 import Logger from '@/components/logger';
 import AnketaComponent from '@/components/anketa';
 import Login from '@/components/login';
+import WatchMatch from '@/components/watchmatch';
+import Face from '@/components/face';
 
 Vue.use(Router);
 
@@ -23,6 +25,16 @@ export default new Router({
       path: '/anketa',
       name: 'Anketa',
       component: AnketaComponent
+    },
+    {
+      path: '/watchmatch',
+      name: 'Watchmatch',
+      component: WatchMatch
+    },
+    {
+        path: '/face',
+        name: 'Face',
+        component: Face
     }
   ]
 });

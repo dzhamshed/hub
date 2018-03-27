@@ -5,6 +5,7 @@ class IntelligentProcessing:
     def __init__(self):
         self.objects = ['Ronaldo', 'Messi', 'ball', 'referee']
         self.coords = None
+        self.currentObject = 'not chosen'
         self.counter = 0
         self.preferences = None
 
@@ -18,3 +19,12 @@ class IntelligentProcessing:
 
     def setPreferences(self, preferences):
         self.preferences = preferences
+
+    def getObjectToWatch(self):
+        return self.currentObject
+
+    def setObjectToWatch(self, objectName):
+        for o in self.objects:
+            if o == objectName:
+                self.currentObject = o
+        return self.currentObject
