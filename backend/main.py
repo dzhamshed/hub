@@ -84,6 +84,7 @@ def join(data):
         join_room('VS_ROOM')
     elif data == 'ER' or data == 'USER':
         join_room('US_ROOM')
+    return 'ok'
 
 
 @socketio.on('leave')
@@ -94,6 +95,7 @@ def leave(data):
         leave_room('VS_ROOM')
     elif data == 'ER' or data == 'USER':
         leave_room('US_ROOM')
+    return 'ok'
 
 
 @socketio.on('anketa')
@@ -125,7 +127,7 @@ def login(data):
         'preferences': data
     }
     emit('intelligent_processing', cdata, broadcast=True, room='IP')
-    emit('login', 'ok')
+    return 'ok'
 
 
 @socketio.on('user_input_stream')
