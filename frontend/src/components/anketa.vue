@@ -1253,7 +1253,7 @@
 //    },
 
     sockets: {
-      registered: function(data) {
+      anketa: function(data) {
         alert("Your ID is " + data + "\nPlease remember it");
       }
     },

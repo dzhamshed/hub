@@ -9,10 +9,6 @@ sys.path.insert(0, os.path.join(cd, 'libs'))
 
 
 from core.videostreamer import VideoStreamer
-from modules.intelligentprocessing import IntelligentProcessing
-from modules.emotionrecognition import EmotionRecognition
-from modules.situationrecognition import SituationRecognition
-from modules.objectrecoginition import ObjectRecognition
 from moviepy.editor import *
 
 from core.database import  pg
@@ -21,42 +17,28 @@ from core.database import  pg
 clip = VideoFileClip(os.path.dirname(os.path.abspath(__file__)) + '/match.mp4')
 # clip.audio.write_audiofile('sound.mp3')
 
-IP = IntelligentProcessing()
-ER = EmotionRecognition()
-SR = SituationRecognition()
-OR = ObjectRecognition(clip.size[0], clip.size[1])
-
 
 from flask import Flask, Response
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, send, emit, join_room, leave_room
+
 app = Flask(__name__)
 
-import logging, json
+import logging, json, base64
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+log.setLevel(logging.DEBUG)
 
 app.config['SECRET_KEY'] = '@SUPERSAFE!'
 socketio = SocketIO(app)
-streamframe = None
 crop = None
-
-
-def start_cycle(chunk):
-    global crop
-    emotion = ER.getemotion(chunk)
-    print('emotion -> ', emotion)
-    situation = SR.getsituation(streamframe)
-    print('situation -> ', situation)
-    coordinates = OR.getcoordinates(streamframe)
-    crop = IP.getobject(emotion, situation, coordinates)
-    print('crop -> ', crop)
-    coords = '(' + str(crop['lx']) + ', ' + str(crop['ly']) + ') x (' + str(crop['rx']) + ', ' + str(crop['ry']) + ')'
-    object_to_watch = IP.getObjectToWatch()
-    emit('output_log', emotion + ' | ' + situation + ' | ' + object_to_watch + ' | ' + coords, broadcast=True)
+emotion = None
+situation = None
+coordinates = None
 
 def streamhandler(streamer):
     while True:
         frame = streamer.get_frame(crop)
+        data = base64.b64encode(frame).decode('ascii')
+        socketio.emit('video_stream', data, broadcast=True, room='VS_ROOM') # situation recognition and object recognition subscribe to this
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
@@ -94,10 +76,24 @@ def disconnect():
     print('socket disconnected')
 
 
-@socketio.on('input_stream')
-def input_stream(data):
-    start_cycle(data)
-    emit('output_stream', data, broadcast=True)
+@socketio.on('join')
+def join(data):
+    print('%s has joined' % data)
+    join_room(data)
+    if data == 'SR' or data == 'OR':
+        join_room('VS_ROOM')
+    elif data == 'ER' or data == 'USER':
+        join_room('US_ROOM')
+
+
+@socketio.on('leave')
+def leave(data):
+    print('%s has left' % data)
+    leave_room(data)
+    if data == 'SR' or data == 'OR':
+        leave_room('VS_ROOM')
+    elif data == 'ER' or data == 'USER':
+        leave_room('US_ROOM')
 
 
 @socketio.on('anketa')
@@ -106,21 +102,88 @@ def anketa(data):
     cursor.execute("INSERT INTO preferences (preferences) VALUES (%s)", (json.dumps(data),))
     pg.commit()
     cursor.close()
-    IP.setPreferences(data)
+    cdata = {
+        'command': 'update_preferences',
+        'preferences': data
+    }
+    emit('intelligent_processing', cdata, broadcast=True, room='IP')
 
     cursor = pg.cursor()
     cursor.execute("SELECT id FROM preferences ORDER BY id DESC LIMIT 1")
     userid = cursor.fetchone()
-    emit("registered", userid, broadcast=True)
+    emit("anketa", userid)
 
 
 @socketio.on('login')
-def login(id):
+def login(data):
+    print('login -> ', data)
     cursor = pg.cursor()
-    cursor.execute("SELECT preferences FROM preferences WHERE id = %s", (id,))
+    cursor.execute("SELECT preferences FROM preferences WHERE id = %s", (data,))
     preferences = cursor.fetchone()
-    IP.setPreferences(preferences)
+    cdata = {
+        'command': 'update_preferences',
+        'preferences': data
+    }
+    emit('intelligent_processing', cdata, broadcast=True, room='IP')
+    emit('login', 'ok')
 
+
+@socketio.on('user_input_stream')
+def input_stream(data):
+    emit('user_stream', data, boradcast=True, room='US_ROOM')
+
+
+@socketio.on('emotion_recognition')
+def ER(data):
+    global emotion
+    global situation
+    global coordinates
+    emotion = data
+    # print('emotion -> ', emotion)
+    if all(v is not None for v in [emotion, situation, coordinates]):
+        cdata = {
+            'command': 'process',
+            'emotion': emotion,
+            'situation': situation,
+            'coordinates': coordinates
+        }
+        emit('intelligent_processing', cdata, broadcast=True, room='IP')
+    elif emotion is None:
+        print('=> emotion')
+    elif situation is None:
+        print('=> situation')
+    elif coordinates is None:
+        print('=> coordinates')
+
+
+@socketio.on('situation_recognition')
+def SR(data):
+    global situation
+    situation = data
+    # print('situation -> ', situation)
+
+
+@socketio.on('object_recognition')
+def OR(data):
+    global coordinates
+    coordinates = data
+    # print('coordinates -> ', coordinates)
+
+
+@socketio.on('intelligent_processing')
+def IP(data):
+    global crop
+    global emotion
+    global situation
+    crop = data
+    # print('crop -> ', crop)
+    coords = '(' + str(crop['lx']) + ', ' + str(crop['ly']) + ') x (' + str(crop['rx']) + ', ' + str(crop['ry']) + ')'
+    logrow = emotion + ' | ' + situation + ' | ' + coords
+    print ('========> ', logrow)
+    emit('logger', logrow, broadcast=True, room='USER')
+
+
+# Temporary
 @socketio.on('get_match_info')
 def get_match_info():
     teams = []
@@ -168,10 +231,21 @@ def get_match_info():
     teams.append(real)
     return teams
 
+
+objects = ['Ronaldo', 'Messi', 'ball', 'referee']
+currentObject = 'not chosen'
+
+
 @socketio.on('setObjectToWatch')
-def setObjectToWatch(object_name):
-    name = IP.setObjectToWatch(object_name)
-    return name
+def setObjectToWatch(objectName):
+    global objects
+    global currentObject
+    for o in objects:
+        if o == objectName:
+            currentObject = o
+    return currentObject
+
+
 
 if __name__ == '__main__':
     socketio.run(app, log_output=False, debug=False)

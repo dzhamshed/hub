@@ -33,12 +33,13 @@ export default {
   },
 
   sockets: {
-    output_stream: function(data) {
+    user_stream: function(data) {
       this.videostream = this.marginstream;
       this.marginstream = data;
     },
-    output_log: function(data) {
-      this.logs.unshift(data)
+    logger: function(data) {
+      console.log('loggs => ', data);
+      this.logs.unshift(data);
     }
   },
 
@@ -46,6 +47,7 @@ export default {
   },
 
   mounted: function() {
+
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
     if (navigator.getUserMedia) {
@@ -70,7 +72,7 @@ export default {
           const fileReader = new FileReader();
           fileReader.onload = function(event) {
             const res = event.target.result;
-            socket.emit('input_stream', res);//res.substring(res.indexOf(';base64,') + 8));
+            socket.emit('user_input_stream', res);//res.substring(res.indexOf(';base64,') + 8));
           };
           fileReader.readAsDataURL(blob)
         }

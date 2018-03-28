@@ -32,6 +32,7 @@ export default {
   methods: {
     login: function () {
       this.$socket.emit('login', this.id);
+      this.$socket.emit('join', 'USER');
       this.$router.push('/logger');
       this.$router.go(1);
     }
