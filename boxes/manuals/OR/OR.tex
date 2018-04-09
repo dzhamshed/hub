@@ -1,0 +1,44 @@
+\documentclass[10pt]{article}
+\usepackage[colorlinks]{hyperref}
+
+\title {
+	Object Recognition (HUB manual)
+}
+
+\date {}
+
+\author {
+	Dzhamshed Khaitov\\
+	dzhamshed.khaitov@nu.edu.kz
+	\and
+	Rassul Rakhimzhan\\
+	rassul.rakhimzhan@nu.edu.kz
+}
+
+\begin{document}
+		
+\maketitle
+
+\section{Introduction}
+
+Hub uses \textbf{SocketIO} for communication, so don't be lazy and just \href{http://www.justfuckinggoogleit.com/search/socketio}{google it}. There are many specific SocketIO for each programming language, but in this manual only python version will be explained. If you're reading this then you need take a look at example code provided along with this manual. So let's go.
+
+\section{Installation}
+You can install SocketIO with \textbf{\textit{pip}} by type \textbf{\textit{pip install socketIO-client}}. That's it! You could find this by googling...
+
+\section{Connection}
+Here goes the interesting part! After installing and importing the SocketIO into your project, you need to connect to the server. You need to ask the IP address/port of the server from the lovely prof Martin Lucak.
+\par
+After connection you need to send to the server command \textbf{join} with data \textbf{OR} (ex: \textit{socketio.emit('join', 'OR')}). As the server receives this command it joins you to the \textbf{video\_stream} room, so you can listen/subscribe to this flow and receive the video streaming to the user (ex: \textit{socketio.on('video\_stream', listener)}).
+
+\section{Transferring data type}
+You will receive video stream in \textbf{JPG frames} encoded in \textbf{base64}. In simpler words: we extract frames from video to make zooming, so we have a video frame in bytes and need to transfer it to you, but SocketIO doesn't support byte transfer \textit{(actually even ordinary http protocol encodes bytes before transferring, so it's better to use SocketIO)}, so we encode bytes into base64. Just keep in mind that you need to decode from base64 if you want to work with bytes.
+After your black-box finds the the objects, you need to send command \textbf{OR} to the server with a \textbf{JSON} data that contains the result (ex: \textit{socketio.emit('OR', data)})
+
+\section{Leaving}
+This is useless command but anyway you should first leave before disconnecting by sending command \textbf{leave} with data \textbf{OR} (ex: \textit{socketio.emit('leave', 'OR')}.
+
+\section{Conclusion}
+Just read the example code and analyze it. Actually you'll learn and understand much more from the provided example code than from this manual. If there are any questions just get in touch with us. Don't forget about having fun otherwise you'll become nerd, only if you already haven't become.
+
+\end{document}

@@ -31,7 +31,7 @@ for name in names:
 
 def listener(data):
   print('received => ', len(data))
-  socketio.emit('object_recognition', objects)
+  socketio.emit('OR', objects)
   print('sent => ', objects)
 
 

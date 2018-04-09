@@ -108,7 +108,7 @@ def anketa(data):
         'command': 'update_preferences',
         'preferences': data
     }
-    emit('intelligent_processing', cdata, broadcast=True, room='IP')
+    emit('IP', cdata, broadcast=True, room='IP')
 
     cursor = pg.cursor()
     cursor.execute("SELECT id FROM preferences ORDER BY id DESC LIMIT 1")
@@ -126,7 +126,7 @@ def login(data):
         'command': 'update_preferences',
         'preferences': data
     }
-    emit('intelligent_processing', cdata, broadcast=True, room='IP')
+    emit('IP', cdata, broadcast=True, room='IP')
     return 'ok'
 
 
@@ -135,7 +135,7 @@ def input_stream(data):
     emit('user_stream', data, boradcast=True, room='US_ROOM')
 
 
-@socketio.on('emotion_recognition')
+@socketio.on('ER')
 def ER(data):
     global emotion
     global situation
@@ -149,7 +149,7 @@ def ER(data):
             'situation': situation,
             'coordinates': coordinates
         }
-        emit('intelligent_processing', cdata, broadcast=True, room='IP')
+        emit('IP', cdata, broadcast=True, room='IP')
     elif emotion is None:
         print('=> emotion')
     elif situation is None:
@@ -158,21 +158,21 @@ def ER(data):
         print('=> coordinates')
 
 
-@socketio.on('situation_recognition')
+@socketio.on('SR')
 def SR(data):
     global situation
     situation = data
     # print('situation -> ', situation)
 
 
-@socketio.on('object_recognition')
+@socketio.on('OR')
 def OR(data):
     global coordinates
     coordinates = data
     # print('coordinates -> ', coordinates)
 
 
-@socketio.on('intelligent_processing')
+@socketio.on('IP')
 def IP(data):
     global crop
     global emotion

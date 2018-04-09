@@ -17,7 +17,7 @@ emotions = ['fear', 'anger', 'sadness', 'depression', 'joy', 'disgust', 'surpris
 def listener(data):
   print('received => ', len(data))
   emotion = random.choice(emotions)
-  socketio.emit('emotion_recognition', emotion)
+  socketio.emit('ER', emotion)
   print('sent => ', emotion)
 
 

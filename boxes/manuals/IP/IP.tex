@@ -1,0 +1,49 @@
+\documentclass[10pt]{article}
+\usepackage[colorlinks]{hyperref}
+
+\title {
+	Intelligent Processing (HUB manual)
+}
+
+\date {}
+
+\author {
+	Dzhamshed Khaitov\\
+	dzhamshed.khaitov@nu.edu.kz
+	\and
+	Rassul Rakhimzhan\\
+	rassul.rakhimzhan@nu.edu.kz
+}
+
+\begin{document}
+		
+\maketitle
+
+\section{Introduction}
+
+Hub uses \textbf{SocketIO} for communication, so don't be lazy and just \href{http://www.justfuckinggoogleit.com/search/socketio}{google it}. There are many specific SocketIO for each programming language, but in this manual only python version will be explained. If you're reading this then you need take a look at example code provided along with this manual. So let's go.
+
+\section{Installation}
+You can install SocketIO with \textbf{\textit{pip}} by type \textbf{\textit{pip install socketIO-client}}. That's it! You could find this by googling...
+
+\section{Connection}
+Here goes the interesting part! After installing and importing the SocketIO into your project, you need to connect to the server. You need to ask the IP address/port of the server from the lovely prof Martin Lucak.
+\par
+After connection you need to send to the server command \textbf{join} with data \textbf{IP} (ex: \textit{socketio.emit('join', 'IP')}). As the server receives this command it joins you to the \textbf{IP} room, so you can listen/subscribe to this flow and receive collected datas from other black-boxes (ex: \textit{socketio.on('IP', listener)}).
+
+\section{Transferring data type}
+You will receive data as \textbf{JSON} that contains field \textbf{command}. This field can have only two values: \textbf{update\_preferences} and textbf{process}.
+\par
+When you receive \textbf{update\_preferences}, there is another field \textbf{preferences} that contains you already understood what it contains (if you didn't then it contains user preferences).
+\par
+In case \textbf{process} there are three other fields \textbf{emotion} of the user, \textbf{situation} of the game and \textbf{coordinates} of the objects. so your really really black-box needs to process these data and fin out right coordinates to zoom video and show to the user.
+\par
+After your black-box finds the desired coordinates, you need to send command \textbf{IP} to the server with the coordinates as JSON (ex: \textit{socketio.emit('IP', coordinates)}). It should contain 4 fields: \textbf{lx, ly} - left-bottom coordinates and \textbf{rx, ry} - right-upper coordinates.
+
+\section{Leaving}
+This is useless command but anyway you should first leave before disconnecting by sending command \textbf{leave} with data \textbf{IP} (ex: \textit{socketio.emit('leave', 'IP')}.
+
+\section{Conclusion}
+Just read the example code and analyze it. Actually you'll learn and understand much more from the provided example code than from this manual. If there are any questions just get in touch with us. Don't forget about having fun otherwise you'll become nerd, only if you already haven't become.
+
+\end{document}

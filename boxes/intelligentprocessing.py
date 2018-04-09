@@ -37,10 +37,10 @@ def setPreferences(prefs):
 def listener(data):
   print('received => ', data)
   if data['command'] == 'process':
-    resp = getobject(data['emotion'], data['situation'], data['coordinates'])
-    socketio.emit('intelligent_processing', resp)
-    print('sent => ', resp)
-  elif data['command'] == 'UP':
+    coordinates = getobject(data['emotion'], data['situation'], data['coordinates'])
+    socketio.emit('IP', coordinates)
+    print('sent => ', coordinates)
+  elif data['command'] == 'update_preferences':
     setPreferences(data['preferences'])
 
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
   socketio.on('connect', connected)
   socketio.on('reconnect', reconnected)
   socketio.on('disconnect', disconnected)
-  socketio.on('intelligent_processing', listener)
+  socketio.on('IP', listener)
   socketio.emit('join', 'IP')
   socketio.wait()
   socketio.emit('leave', 'IP')
