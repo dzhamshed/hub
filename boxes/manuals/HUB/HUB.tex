@@ -1,0 +1,56 @@
+\documentclass[10pt]{article}
+\usepackage[colorlinks]{hyperref}
+
+\title {
+	THE HUB MANUAL
+}
+
+\date {}
+
+\author {
+	Dzhamshed Khaitov\\
+	dzhamshed.khaitov@nu.edu.kz
+	\and
+	Rassul Rakhimzhan\\
+	rassul.rakhimzhan@nu.edu.kz
+}
+
+\begin{document}
+		
+\maketitle
+
+\section{Introduction}
+
+The hub is a web service, it consists of two parts: frontend and backend. The frontend is written with \textbf{VueJS}, and the backend is written in \textbf{Python 3} with \textbf{Flask framework}, \textbf{Flask SocketIO} and \textbf{PostgreSQL} (if curious then google it). But it's not just a hub and it also does the video zooming and this video zooming is done with the help of \textbf{OpenCV}. So, some installations and configurations should be done to make it work and this manual helps with them. The manual explains the installation on Linux Ubuntu 16.04 LTS, as some installation commands are specific for each OS, the reader needs to google it for his/her OS.
+
+\section{Installation}
+\subsection{The frontend}
+The frontend needs \textbf{NodeJS} to be installed:
+
+\begin{enumerate}
+	\item curl -sL https://deb.nodesource.com/setup\_6.x | sudo -E bash -
+	\item sudo apt-get install -y nodejs
+\end{enumerate}
+
+\subsection{The backend}
+The backend is a little more difficult (but don't be afraid, we'll do it!). The installation goes:
+
+\begin{enumerate}
+	\item OpenCV and ffmpeg: apt install opencv ffmpeg
+	\item OpenCV library for Python: pip3 install opencv-python
+	\item PostgreSQL: apt install postgresql
+	\item PostgreSQL library for Python: pip3 install psycopg2
+\end{enumerate}
+
+\section{Configuration}
+The frontend doesn't need any configuration, but just backend. After installation, it's necessary to create database with name \textbf{\textit{hub}}. Then, place the the video file (it should be called \textbf{match.mp4}) in the \textbf{backend} folder and run script called \textbf{extractaudio.py} (We translate audio and video frames separately, because of zooming, so this script extracts the audio from the video file). When it finishes there should be new file called \textbf{sound.mp3}.
+
+\section{Launching}
+For the frontend just go to the folder \textbf{frontend} and run command \textbf{npm start}.
+\linebreak
+For the backend go to the folder \textbf{backend} and run script \textbf{main.py}.
+
+\section{Conclusion}
+The hub is actually placed as an open source project on \href{https://github.com/h-jamik/hub}{github.com} (https://github.com/h-jamik/hub), so it's easy to download it or just clone it by git (\textit{git clone https://github.com/h-jamik/hub.git}). And if there will be any problems (which is not expected) specific to the OS on which it's going to be installed, then just google it (it'll be easy to find solutions).
+
+\end{document}

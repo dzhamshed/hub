@@ -99,7 +99,7 @@
                         const fileReader = new FileReader();
                         fileReader.onload = function(event) {
                             const res = event.target.result;
-                            socket.emit('input_stream', res);//res.substring(res.indexOf(';base64,') + 8));
+                            socket.emit('user_input_stream', res);//res.substring(res.indexOf(';base64,') + 8));
                         };
                         fileReader.readAsDataURL(blob)
                     }

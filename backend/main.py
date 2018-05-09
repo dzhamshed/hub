@@ -9,13 +9,8 @@ sys.path.insert(0, os.path.join(cd, 'libs'))
 
 
 from core.videostreamer import VideoStreamer
-from moviepy.editor import *
 
 from core.database import  pg
-
-# first extract audio from video
-clip = VideoFileClip(os.path.dirname(os.path.abspath(__file__)) + '/match.mp4')
-# clip.audio.write_audiofile('sound.mp3')
 
 
 from flask import Flask, Response

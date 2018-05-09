@@ -14,7 +14,7 @@ from socketIO_client import SocketIO
 socketio = None
 
 names = ['Ronaldo', 'Messi', 'ball', 'referee']
-width, height = 1000, 1000
+width, height = 1280, 720
 objects = []
 for name in names:
   lx = random.randint(0, width - 100)

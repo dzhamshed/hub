@@ -33,7 +33,7 @@ export default {
     login: function () {
       this.$socket.emit('login', this.id);
       this.$socket.emit('join', 'USER');
-      this.$router.push('/logger');
+      this.$router.push('/watchmatch');
       this.$router.go(1);
     }
   }
